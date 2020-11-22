@@ -2,25 +2,33 @@ package com.cal_math.logic;
 
 import java.util.*;
 
-public class Proof {
+public class Proofer {
+    public static void main (String[] argv) {
+        Atomic p = new Atomic("P");
+        Atomic q = new Atomic("Q");
+        ImplySentence is = new ImplySentence(p, q);
 
-    ArrayList<Sentence> premises;
-    Sentence conclusion;
-    String symbolList[];
+        ArrayList<Sentence> premises = new ArrayList<Sentence>();
+        premises.add(p);
+        premises.add(is);
+        Sentence conclusion = q;
 
-    public Proof(ArrayList<Sentence> premises, Sentence conclusion, String symbolList[]) {
-        this.premises = premises;
-        this.conclusion = conclusion;
-        this.symbolList = symbolList;
+        Proof proof = new Proof(premises, conclusion, new String[]{"P", "Q"});
+        proof.generateTruthTable();
     }
 
-    public void generateTruthTable() {
+    private static void generateTruthTable(ArrayList<Sentence> premises, Sentence conclusion) {
+        // Find out all symbols involved in both premises and conclusion
+        Set<String> symbols = findSymbols(premises, conclusion);
+        int n = symbols.size();
+        String symbolList[] = new String[n];
+        symbolList = symbols.toArray(symbolList);
         ArrayList<Map<String, Boolean>> truthCombinations = generateTruthCombinations(symbolList);
         for (Map<String, Boolean> truthCombination : truthCombinations)
-            printTruthValues(truthCombination);
+            printTruthValues(truthCombination, premises, conclusion);
     }
 
-    private void printTruthValues(Map<String, Boolean> truthCombination) {
+    private static void printTruthValues(Map<String, Boolean> truthCombination, ArrayList<Sentence> premises, Sentence conclusion) {
         // Print truth combination
         // using for-each loop for iteration over Map.entrySet()
         for (Map.Entry<String,Boolean> entry : truthCombination.entrySet())
@@ -34,11 +42,11 @@ public class Proof {
         System.out.println("------------------------------------------------");
     }
 
-    private ArrayList<Map<String, Boolean>> generateTruthCombinations(String[] symbolList) {
+    private static ArrayList<Map<String, Boolean>> generateTruthCombinations(String[] symbolList) {
         return generateTruthCombinationsHelper(0, symbolList) ;
     }
 
-    private ArrayList<Map<String, Boolean>> generateTruthCombinationsHelper(int index, String[] symbolList) {
+    private static ArrayList<Map<String, Boolean>> generateTruthCombinationsHelper(int index, String[] symbolList) {
         // base case: reach last element
         if (index == symbolList.length - 1) {
             // Add two maps to a new ArrayList with the last symbol T and F
@@ -66,6 +74,13 @@ public class Proof {
             truthCombinations.addAll(clonedCombinations);
             return truthCombinations;
         }
+    }
+
+    private static Set<String> findSymbols(ArrayList<Sentence> premises, Sentence conclusion) {
+        Set<String> symbols = new HashSet<String>();
+        symbols.add("P");
+        symbols.add("Q");
+        return symbols;
     }
 
 }
